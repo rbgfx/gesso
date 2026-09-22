@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require "fileutils"
+require "gesso/auto"
+
+command = ARGV.shift
+case command
+when "render"
+  path = ARGV.shift
+  frames = 1
+  output = "out"
+  OptionParser.new do |opts|
+    opts.on("--frames N", Integer) { |value| frames = value }
+    opts.on("-o DIR") { |value| output = value }
+  end.parse!(ARGV)
+  load path
+  Gesso::Auto.sync!
+  FileUtils.mkdir_p(output)
+  sketch = Gesso::Auto.sketch
+  frames.times { |index| sketch.frame.write(File.join(output, format("frame_%05d.png", index))) }
+when "run"
+  path = ARGV.shift
+  backend = :auto
+  frames = nil
+  output_dir = "."
+  OptionParser.new do |opts|
+    opts.on("--backend NAME") { |value| backend = value.to_sym }
+    opts.on("--frames N", Integer) { |value| frames = value }
+    opts.on("-o DIR") { |value| output_dir = value }
+  end.parse!(ARGV)
+  load path
+  Gesso::Auto.sync!
+  Gesso::Runner::Window.run(Gesso::Auto.sketch, backend: backend, frames: frames, output_dir: output_dir)
+else
+  warn "usage: gesso render FILE [--frames N] [-o DIR] | run FILE [--backend NAME]"
+  exit 1
+end
