@@ -1,17 +1,14 @@
 # Gesso
 
-[![Gem version](https://badge.fury.io/rb/gesso.svg)](https://rubygems.org/gems/gesso)
-[![Downloads](https://img.shields.io/gem/dt/gesso?label=downloads)](https://rubygems.org/gems/gesso)
-[![CI](https://github.com/rbgfx/gesso/actions/workflows/main.yml/badge.svg)](https://github.com/rbgfx/gesso/actions/workflows/main.yml)
-[![Ruby](https://img.shields.io/badge/ruby-%3E%3D3.1-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org/)
-[![License](https://img.shields.io/badge/license-MIT-750014.svg)](LICENSE.txt)
+> Processing-style 2D drawing for Ruby, backed by Tessel and RBGL.
 
-> Processing-style 2D drawing for Ruby, backed by Tessel and rbgl.
+[![Gem version](https://badge.fury.io/rb/gesso.svg)](https://rubygems.org/gems/gesso) [![Downloads](https://img.shields.io/gem/dt/gesso?label=downloads)](https://rubygems.org/gems/gesso) [![Ruby](https://img.shields.io/badge/ruby-%3E%3D3.1-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org/) [![CI](https://github.com/rbgfx/gesso/actions/workflows/main.yml/badge.svg)](https://github.com/rbgfx/gesso/actions/workflows/main.yml) [![License](https://img.shields.io/badge/license-MIT-750014.svg)](LICENSE.txt)
 
-Gesso is a small creative coding DSL for sketches that can run in an rbgl
-window or render deterministic PNG frames without a window.
+**[Features](#features) · [Installation](#installation) · [Requirements](#requirements) · [Quick start](#quick-start) · [CLI](#cli) · [Development](#development) · [License](#license) · [Website](https://rbgfx.github.io/gesso/)**
 
-**[Features](#features) · [Installation](#installation) · [Quick start](#quick-start) · [CLI](#cli) · [Development](#development)**
+---
+
+Gesso is a small creative-coding DSL for sketches that run in an RBGL window or render deterministic PNG frames without a window.
 
 ## Features
 
@@ -41,6 +38,11 @@ Or install the released gem:
 ~~~sh
 gem install gesso
 ~~~
+
+## Requirements
+
+- Ruby 3.1 or newer.
+- A C toolchain is needed when Bundler builds Larb's native extension.
 
 ## Quick start
 
