@@ -477,14 +477,33 @@ module Gesso
         window&.close
       end
     end
+
+    class Web
+      EVENTS = %i[mouse_press mouse_release mouse_move key_press key_release scroll resize].freeze
+
+      def self.run(sketch, canvas: "#screen", pixelated: false)
+        require "webvas"
+        require "rbgl"
+        sketch.prepare!
+        backend = Webvas::Backend.new(width: sketch.width, height: sketch.height, canvas:, pixelated:)
+        window = RBGL::GUI::Window.new(width: sketch.width, height: sketch.height, backend:)
+        EVENTS.each { |type| window.on(type) { |event| sketch.handle(event.to_h) } }
+        Webvas.run(window) { sketch_frame = sketch.frame; window.set_pixels(sketch_frame.bytes) }
+      end
+    end
   end
 
   module_function
 
-  def run(width: 640, height: 480, seed: Random.new_seed, &block)
+  def run(width: 640, height: 480, seed: Random.new_seed, runner: :headless, canvas: "#screen", pixelated: false, &block)
     sketch = Sketch.new(width: width, height: height, seed: seed)
     sketch.instance_eval(&block)
-    Runner::Headless.run(sketch, frames: 1).first
+    case runner.to_sym
+    when :headless then Runner::Headless.run(sketch, frames: 1)
+    when :window then Runner::Window.run(sketch)
+    when :web then Runner::Web.run(sketch, canvas:, pixelated:)
+    else raise ArgumentError, "unknown Gesso runner: #{runner}"
+    end
     sketch
   end
 end

@@ -9,7 +9,7 @@
   <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-MIT-750014.svg" alt="License"></a>
 </p>
 
-[Features](#features) · [Installation](#installation) · [Quick Start](#quick-start) · [CLI](#cli)
+[Features](#features) · [Installation](#installation) · [Quick Start](#quick-start) · [Browser](#browser) · [CLI](#cli)
 
 ***
 
@@ -88,6 +88,23 @@ gesso render examples/bubbles.rb --frames 3 -o frames
 
 Use <code>--backend file</code> for a headless window run. The
 <code>examples/gui_sketch.rb</code> example shows the optional Twiddle panel.
+
+## Browser
+
+Add the Webvas gem to the application bundle to run a sketch in a browser worker. The Webvas playground build includes Gesso and its graphics dependencies.
+
+~~~ruby
+require "gesso"
+
+Gesso.run(width: 480, height: 320, runner: :web) do
+  background "#171a18"
+  draw do
+    background "#171a18"
+    fill "#d38a62"
+    circle 240, 160, 48
+  end
+end
+~~~
 
 ## Development
 

@@ -10,6 +10,7 @@ gem "glyphic", path: "../glyphic"
 gem "twiddle", path: "../twiddle"
 gem "rbgl", path: "../rbgl"
 gem "larb", path: "../larb"
+gem "rlsl", path: "../rlsl"
 
 gem "irb"
 gem "rake", "~> 13.0"

@@ -52,6 +52,45 @@ RSpec.describe Gesso do
     end
   end
 
+  it "runs a browser sketch through webvas' requestAnimationFrame loop" do
+    require "rbgl"
+    backend_class = Class.new(RBGL::GUI::Backend) do
+      attr_reader :presented
+
+      def initialize(width:, height:, **options)
+        super(width, height)
+        @events = [RBGL::GUI::Event.new(:mouse_press, x: 1, y: 1)]
+      end
+
+      def poll_events = [@events.shift].compact
+      def present(_framebuffer) = (@presented = @pixels; true)
+      def set_pixels(buffer, _width, _height) = (@pixels = buffer; true)
+      def should_close? = false
+      def close = nil
+    end
+    webvas = Module.new
+    webvas.const_set(:Backend, backend_class)
+    captured_window = nil
+    webvas.define_singleton_method(:run) do |window, &callback|
+      captured_window = window
+      window.step(0.0, &callback)
+    end
+    stub_const("Webvas", webvas)
+    $LOADED_FEATURES << "webvas.rb"
+
+    mouse_presses = 0
+    sketch = Gesso.run(width: 4, height: 3, runner: :web) do
+      mouse_pressed { mouse_presses += 1 }
+      background "#123456"
+    end
+
+    expect(sketch.frame_count).to eq(1)
+    expect(mouse_presses).to eq(1)
+    expect(captured_window.backend.presented).to eq(sketch.canvas.bytes)
+  ensure
+    $LOADED_FEATURES.delete("webvas.rb")
+  end
+
   it "runs setup before a window or headless frame is created" do
     sketch = Gesso::Sketch.new
     sketch.setup { sketch.size(7, 5) }
