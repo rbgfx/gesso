@@ -66,6 +66,19 @@ end
 sketch.canvas.write("shot.png")
 ~~~
 
+Install the optional [Flipbook](https://github.com/rbgfx/flipbook) gem to record the next frames as an animated GIF:
+
+~~~ruby
+Gesso.run(width: 320, height: 200) do
+  save_gif("sketch.gif", frames: 120, fps: 30)
+  draw do
+    background 16, 24, 39
+    fill 240, 120, 80
+    circle width / 2 + Math.sin(millis / 200.0) * 40, height / 2, 30
+  end
+end
+~~~
+
 For a top-level sketch file, load the automatic DSL:
 
 ~~~ruby

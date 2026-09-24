@@ -96,6 +96,7 @@ module Gesso
         @ui_events.clear
       end
       @frame_count += 1
+      record_gif_frame
       @canvas
     end
 
@@ -282,6 +283,29 @@ module Gesso
 
     def load_image(path) = Tessel.read(path)
     def save(path) = @canvas.write(path)
+    def save_gif(path, frames: 120, fps: frame_rate, loop: true)
+      raise ArgumentError, "a GIF recording is already active" if @gif_recorder
+      raise TypeError, "frames must be an Integer" unless frames.is_a?(Integer)
+      raise ArgumentError, "frames must be positive" unless frames.positive?
+
+      rate = Float(fps)
+      raise ArgumentError, "fps must be finite and positive" unless rate.finite? && rate.positive?
+      begin
+        require "flipbook"
+      rescue LoadError => error
+        raise LoadError, "Gesso#save_gif requires the optional flipbook gem", cause: error
+      end
+      writer = Flipbook::GIF::Writer.open(path, width: @width, height: @height, loop:, palette: :per_frame)
+      @gif_recorder = { writer:, remaining: frames, delay: Rational(1, rate.to_s) }
+      path
+    end
+    def gif_frames_remaining = @gif_recorder&.fetch(:remaining)
+
+    def close
+      recorder = @gif_recorder
+      @gif_recorder = nil
+      recorder&.fetch(:writer)&.close
+    end
     def get(x, y) = @canvas[x, y]
     def set(x, y, value) = @canvas[x, y] = value
 
@@ -330,6 +354,14 @@ module Gesso
     end
 
     private
+
+    def record_gif_frame
+      return unless @gif_recorder
+
+      @gif_recorder[:writer].add(@canvas, delay: @gif_recorder[:delay])
+      @gif_recorder[:remaining] -= 1
+      close if @gif_recorder[:remaining].zero?
+    end
 
     def color(*args)
       args = args.first if args.length == 1 && args.first.is_a?(Array)
@@ -457,6 +489,8 @@ module Gesso
       def self.run(sketch, frames: 1)
         sketch.prepare!
         Array.new(frames) { sketch.frame.dup }
+      ensure
+        sketch.close
       end
     end
 
@@ -475,6 +509,7 @@ module Gesso
         end
       ensure
         window&.close
+        sketch.close
       end
     end
 
@@ -499,7 +534,7 @@ module Gesso
     sketch = Sketch.new(width: width, height: height, seed: seed)
     sketch.instance_eval(&block)
     case runner.to_sym
-    when :headless then Runner::Headless.run(sketch, frames: 1)
+    when :headless then Runner::Headless.run(sketch, frames: sketch.gif_frames_remaining || 1)
     when :window then Runner::Window.run(sketch)
     when :web then Runner::Web.run(sketch, canvas:, pixelated:)
     else raise ArgumentError, "unknown Gesso runner: #{runner}"

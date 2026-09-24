@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "tmpdir"
+require "flipbook"
 
 RSpec.describe Gesso do
   it "has a version number" do
@@ -30,6 +31,21 @@ RSpec.describe Gesso do
     sketch.draw { sketch.background(sketch.frame_count.zero? ? "#ff0000" : "#0000ff") }
     frames = Gesso::Runner::Headless.run(sketch, frames: 2)
     expect(frames.map { |image| image[0, 0] }).to eq([[255, 0, 0, 255], [0, 0, 255, 255]])
+  end
+
+  it "records the requested headless frames as a GIF" do
+    Dir.mktmpdir do |directory|
+      output = File.join(directory, "sketch.gif")
+      sketch = Gesso.run(width: 2, height: 1) do
+        save_gif(output, frames: 3, fps: 10)
+        draw { background(frame_count.even? ? "#ff0000" : "#0000ff") }
+      end
+
+      frames = Flipbook.read(output)
+      expect(frames.length).to eq(3)
+      expect(frames.map { |frame| frame[0, 0] }).to eq([[255, 0, 0, 255], [0, 0, 255, 255], [255, 0, 0, 255]])
+      expect(sketch.gif_frames_remaining).to be_nil
+    end
   end
 
   it "transforms rectangle strokes exactly once" do

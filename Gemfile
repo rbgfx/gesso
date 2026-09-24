@@ -11,6 +11,7 @@ gem "twiddle", path: "../twiddle"
 gem "rbgl", path: "../rbgl"
 gem "larb", path: "../larb"
 gem "rlsl", path: "../rlsl"
+gem "flipbook", path: "../flipbook"
 
 gem "irb"
 gem "rake", "~> 13.0"

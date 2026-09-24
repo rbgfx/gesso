@@ -1,4 +1,8 @@
 module Gesso
   VERSION: String
-  # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+  class Sketch
+    def save_gif: (String path, ?frames: Integer, ?fps: Numeric, ?loop: bool | Integer) -> String
+    def gif_frames_remaining: () -> Integer?
+    def close: () -> untyped
+  end
 end
