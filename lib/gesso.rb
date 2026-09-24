@@ -486,8 +486,9 @@ module Gesso
 
   module Runner
     class Headless
-      def self.run(sketch, frames: 1)
+      def self.run(sketch, frames: nil)
         sketch.prepare!
+        frames ||= sketch.gif_frames_remaining || 1
         Array.new(frames) { sketch.frame.dup }
       ensure
         sketch.close
@@ -534,7 +535,7 @@ module Gesso
     sketch = Sketch.new(width: width, height: height, seed: seed)
     sketch.instance_eval(&block)
     case runner.to_sym
-    when :headless then Runner::Headless.run(sketch, frames: sketch.gif_frames_remaining || 1)
+    when :headless then Runner::Headless.run(sketch)
     when :window then Runner::Window.run(sketch)
     when :web then Runner::Web.run(sketch, canvas:, pixelated:)
     else raise ArgumentError, "unknown Gesso runner: #{runner}"

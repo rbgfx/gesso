@@ -37,7 +37,7 @@ RSpec.describe Gesso do
     Dir.mktmpdir do |directory|
       output = File.join(directory, "sketch.gif")
       sketch = Gesso.run(width: 2, height: 1) do
-        save_gif(output, frames: 3, fps: 10)
+        setup { save_gif(output, frames: 3, fps: 10) }
         draw { background(frame_count.even? ? "#ff0000" : "#0000ff") }
       end
 
