@@ -1,5 +1,7 @@
 # Changelog
 
+Version 0.2.0 was tagged but not published. Version 0.2.1 is the first published 0.2 release.
+
 ## [0.2.1] - 2026-09-25
 
 - Run sketches in the browser with Webvas.
