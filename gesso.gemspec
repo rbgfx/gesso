@@ -5,7 +5,7 @@ require_relative "lib/gesso/version"
 Gem::Specification.new do |spec|
   spec.name = "gesso"
   spec.version = Gesso::VERSION
-  spec.authors = ["ydah"]
+  spec.authors = ["Yudai Takada"]
   spec.email = ["t.yudai92@gmail.com"]
 
   spec.summary = "Processing style 2D drawing for Ruby"
