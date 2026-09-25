@@ -8,11 +8,9 @@ updates:
       default-days: 7
     # Sibling repos are unavailable to the isolated updater.
     ignore:
-      - dependency-name: glyphic
-      - dependency-name: larb
-      - dependency-name: rbgl
+      - dependency-name: metaco
+      - dependency-name: rlsl
       - dependency-name: tessel
-      - dependency-name: twiddle
   - package-ecosystem: github-actions
     directory: /
     schedule:
