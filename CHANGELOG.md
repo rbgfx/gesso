@@ -2,7 +2,7 @@
 
 ## [0.2.1] - 2026-09-25
 
-- Constrain runtime dependencies to supported major versions.
+- Prevent Bundler from selecting unsupported major versions of runtime dependencies.
 
 ## [0.2.0] - 2026-09-25
 
