@@ -3,6 +3,6 @@ module Gesso
   class Sketch
     def save_gif: (String path, ?frames: Integer, ?fps: Numeric, ?loop: bool | Integer) -> String
     def gif_frames_remaining: () -> Integer?
-    def close: () -> untyped
+    def close: (?discard: bool) -> untyped
   end
 end
