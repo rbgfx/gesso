@@ -123,7 +123,7 @@ module Gesso
       mode = mode.to_sym
       raise ArgumentError, "color mode must be :rgb or :hsb" unless %i[rgb hsb].include?(mode)
       ranges = [max1, max2, max3, max_alpha].map(&:to_f)
-      raise ArgumentError, "color ranges must be positive" unless ranges.all?(&:positive?)
+      raise ArgumentError, "color ranges must be finite and positive" unless ranges.all? { |range| range.finite? && range.positive? }
       @color_mode = mode
       @color_ranges = ranges
     end
@@ -149,7 +149,7 @@ module Gesso
     def frame_rate(value = nil)
       return (@frame_rate || 60.0) unless value
       value = value.to_f
-      raise ArgumentError, "frame rate must be positive" unless value.positive?
+      raise ArgumentError, "frame rate must be finite and positive" unless value.finite? && value.positive?
       @frame_rate = value
     end
     def millis = (@frame_count * 1000.0 / frame_rate).round

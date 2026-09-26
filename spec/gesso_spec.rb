@@ -164,6 +164,7 @@ RSpec.describe Gesso do
 
     expect(dragged).to eq(1)
     expect { sketch.frame_rate(0) }.to raise_error(ArgumentError)
+    expect { sketch.frame_rate(Float::INFINITY) }.to raise_error(ArgumentError)
     expect { sketch.size(0, 4) }.to raise_error(ArgumentError)
   end
 
@@ -191,6 +192,7 @@ RSpec.describe Gesso do
     expect(sketch.canvas[0, 0]).to eq([32, 32, 32, 128])
     expect { sketch.color_mode(:cmyk) }.to raise_error(ArgumentError)
     expect { sketch.color_mode(:rgb, 0) }.to raise_error(ArgumentError)
+    expect { sketch.color_mode(:rgb, Float::INFINITY) }.to raise_error(ArgumentError)
   end
 
   it "supports rectangle and ellipse coordinate modes" do
