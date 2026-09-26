@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "tessel"
+require "tempfile"
 
 require_relative "gesso/version"
 
@@ -295,16 +296,32 @@ module Gesso
       rescue LoadError => error
         raise LoadError, "Gesso#save_gif requires the optional flipbook gem", cause: error
       end
-      writer = Flipbook::GIF::Writer.open(path, width: @width, height: @height, loop:, palette: :per_frame)
-      @gif_recorder = { writer:, remaining: frames, delay: Rational(1, rate.to_s) }
+      target = File.expand_path(path)
+      mode = File.exist?(target) ? File.stat(target).mode & 0o777 : 0o666 & ~File.umask
+      io = Tempfile.new(".gesso-", File.dirname(target))
+      io.binmode
+      writer = Flipbook::GIF::Writer.new(io, width: @width, height: @height, loop:, palette: :per_frame)
+      @gif_recorder = { writer:, io:, target:, mode:, remaining: frames, delay: Rational(1, rate.to_s) }
       path
+    rescue Exception
+      io&.close!
+      raise
     end
     def gif_frames_remaining = @gif_recorder&.fetch(:remaining)
 
-    def close
+    def close(discard: false)
       recorder = @gif_recorder
       @gif_recorder = nil
-      recorder&.fetch(:writer)&.close
+      return unless recorder
+      return recorder[:io].close! if discard
+
+      recorder[:writer].close
+      recorder[:io].close
+      File.chmod(recorder[:mode], recorder[:io].path)
+      File.rename(recorder[:io].path, recorder[:target])
+    rescue Exception
+      recorder&.fetch(:io)&.close!
+      raise
     end
     def get(x, y) = @canvas[x, y]
     def set(x, y, value) = @canvas[x, y] = value
@@ -489,9 +506,11 @@ module Gesso
       def self.run(sketch, frames: nil)
         sketch.prepare!
         frames ||= sketch.gif_frames_remaining || 1
-        Array.new(frames) { sketch.frame.dup }
+        images = Array.new(frames) { sketch.frame.dup }
+        completed = true
+        images
       ensure
-        sketch.close
+        sketch.close(discard: !completed)
       end
     end
 
@@ -508,9 +527,10 @@ module Gesso
           delay = 1.0 / sketch.frame_rate - (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started)
           sleep(delay) if delay.positive? && backend.to_sym != :file
         end
+        completed = true
       ensure
         window&.close
-        sketch.close
+        sketch.close(discard: !completed)
       end
     end
 

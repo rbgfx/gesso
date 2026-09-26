@@ -48,6 +48,24 @@ RSpec.describe Gesso do
     end
   end
 
+  it "keeps an existing GIF when a recording fails before its requested frames" do
+    Dir.mktmpdir do |directory|
+      output = File.join(directory, "sketch.gif")
+      File.binwrite(output, "original")
+      sketch = Gesso::Sketch.new(width: 2, height: 1)
+      sketch.setup { sketch.save_gif(output, frames: 3, fps: 10) }
+      sketch.draw do
+        raise "drawing failed" if sketch.frame_count == 1
+
+        sketch.background("#ff0000")
+      end
+
+      expect { Gesso::Runner::Headless.run(sketch, frames: 3) }.to raise_error("drawing failed")
+      expect(File.binread(output)).to eq("original")
+      expect(Dir.children(directory)).to eq(["sketch.gif"])
+    end
+  end
+
   it "transforms rectangle strokes exactly once" do
     sketch = Gesso::Sketch.new(width: 8, height: 8)
     sketch.no_fill
