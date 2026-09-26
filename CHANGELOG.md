@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.2] - 2026-09-26
+
+- Preserve existing GIF recordings when a sketch fails.
+- Reject non-finite frame rates and color ranges.
+
 ## [0.2.1] - 2026-09-25
 
 - Prevent Bundler from selecting unsupported major versions of runtime dependencies.
